@@ -1,10 +1,10 @@
 import json
 
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 
 
-class ChatConsumer(WebsocketConsumer):
+class ChatConsumer(AsyncWebsocketConsumer):
     """
     Represents a WebSocket consumer for handling chat functionality.
 
@@ -22,36 +22,35 @@ class ChatConsumer(WebsocketConsumer):
         chat_message(event): Receives a message from the room group and sends it to the WebSocket.
     """
 
-    def connect(self):
+    async def connect(self):
+        # 현재 WebSocket이 연결된 채팅방의 이름을 가져옴
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        # 채팅방의 그룹 이름을 생성
         self.room_group_name = f"chat_{self.room_name}"
 
-        # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name, self.channel_name
-        )
+        # 채팅방 그룹에 소비자를 추가하여 연결
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
-        self.accept()
+        # WebSocket 연결을 수락
+        await self.accept()
 
-    def disconnect(self, close_code):
-        # Leave room group
-        async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name, self.channel_name
-        )
+    async def disconnect(self, close_code):
+        # 채팅방 그룹에서 나가기
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-    # Receive message from WebSocket
-    def receive(self, text_data):
+    # WebSocket으로부터 메시지 받기
+    async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
 
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
+        # 채팅방 그룹에 메시지 보내기
+        await self.channel_layer.group_send(
             self.room_group_name, {"type": "chat.message", "message": message}
         )
 
-    # Receive message from room group
-    def chat_message(self, event):
+    # 채팅방 그룹으로부터 메시지 받기
+    async def chat_message(self, event):
         message = event["message"]
 
-        # Send message to WebSocket
-        self.send(text_data=json.dumps({"message": message}))
+        # WebSocket으로 메시지 보내기
+        await self.send(text_data=json.dumps({"message": message}))
