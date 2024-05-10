@@ -19,6 +19,7 @@ env = environ.Env(DEBUG=(bool, True))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
+channel_layer_redis = env.db_url('CHANNEL_LAYER_REDIS_URL')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -29,8 +30,22 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                {
+                    "host": channel_layer_redis["HOST"],
+                    "port": channel_layer_redis.get("PORT") or 6379,
+                    "password": channel_layer_redis["PASSWORD"],
+                }
+            ]
+        },
+    },
+}
 
 # Application definition
 
