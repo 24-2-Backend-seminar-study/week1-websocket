@@ -28,3 +28,14 @@ class SignUpView(APIView):
             user.save()
 
         return set_token_on_response_cookie(user, status_code=status.HTTP_201_CREATED)
+
+class SignInView(APIView):
+    def post(self, request):
+        user = User.objects.filter(username=request.data["username"]).first()
+        if user is None:
+            return Response({"message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if not user.check_password(request.data["password"]):
+            return Response({"message": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        return set_token_on_response_cookie(user, status_code=status.HTTP_200_OK)
