@@ -10,6 +10,126 @@
     <input id="room-name-input" type="text" size="100"><br>
     <input id="room-name-submit" type="button" value="Enter">
 
+    <!-- 회원가입 버튼 -->
+    <input id="signup-button" type="button" value="Sign Up" onclick="showInputFields('signup')">
+    <!-- 로그인 버튼 -->
+    <input id="login-button" type="button" value="Log In" onclick="showInputFields('login')">
+
+    <!-- 입력 필드 -->
+    <div id="input-fields" style="display: none;">
+        <input id="username-input" type="text" placeholder="Username"><br>
+        <input id="password-input" type="password" placeholder="Password"><br>
+        <input id="submit-button" type="button" onclick="submitForm()">
+    </div>
+
+    <script>
+        function showInputFields(action) {
+            var inputFields = document.querySelector('#input-fields');
+            var submitButton = document.querySelector('#submit-button');
+            if (action === 'signup') {
+            inputFields.style.display = 'block';
+            submitButton.value = 'Sign Up';
+            } else if (action === 'login') {
+            inputFields.style.display = 'block';
+            submitButton.value = 'Log In';
+            }
+        }
+
+        function submitForm() {
+            var username = document.querySelector('#username-input').value;
+            var password = document.querySelector('#password-input').value;
+            var action = document.querySelector('#submit-button').value;
+            // Make a request to the server using fetch or XMLHttpRequest
+            // and pass the username, password, and action to the server-side view
+            // Example using fetch:
+            if (action === 'Sign Up') {
+            fetch('/account/signup/', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                username: username,
+                password: password,
+                action: action,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors that occurred during the request
+                console.error(error);
+            });
+            } else if (action === 'Log In') {
+            fetch('/account/signin/', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                username: username,
+                password: password,
+                action: action,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors that occurred during the request
+                console.error(error);
+            });
+            }
+        }
+
+        {% comment %} function submitForm() {
+            var username = document.querySelector('#username-input').value;
+            var password = document.querySelector('#password-input').value;
+            var action = document.querySelector('#submit-button').value;
+
+            // Make a request to the server using fetch or XMLHttpRequest
+            // and pass the username, password, and action to the server-side view
+
+            // Example using fetch:
+            fetch('/account/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    action: action,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors that occurred during the request
+                console.error(error);
+            });
+        } {% endcomment %}
+
+        document.querySelector('#room-name-input').focus();
+        document.querySelector('#room-name-input').onkeyup = function(e) {
+            if (e.key === 'Enter') {  // enter, return
+                document.querySelector('#room-name-submit').click();
+            }
+        };
+        document.querySelector('#room-name-submit').onclick = function(e) {
+            var roomName = document.querySelector('#room-name-input').value;
+            window.location.pathname = '/chat/' + roomName + '/';
+        };
+    </script>
+
     <script>
         document.querySelector('#room-name-input').focus();
         document.querySelector('#room-name-input').onkeyup = function(e) {
