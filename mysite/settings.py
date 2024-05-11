@@ -52,6 +52,7 @@ CHANNEL_LAYERS = {
 INSTALLED_APPS = [
     'daphne',
     'chat',
+    'account',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
