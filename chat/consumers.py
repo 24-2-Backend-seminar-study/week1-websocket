@@ -24,6 +24,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         # 현재 WebSocket이 연결된 채팅방의 이름을 가져옴
+        if self.scope["user"].is_anonymous:
+            await self.close()
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         # 채팅방의 그룹 이름을 생성
         self.room_group_name = f"chat_{self.room_name}"
