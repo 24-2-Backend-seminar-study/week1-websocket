@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'rest_framework_simplejwt',
     'account',
     'django.contrib.admin',
@@ -138,3 +139,5 @@ REST_FRAMEWORK = {
 }
 
 REST_USE_JWT = True
+
+ASGI_APPLICATION='mysite.asgi.application'
