@@ -25,6 +25,7 @@ environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
+channel_layer_redis = env.db_url('CHANNEL_LAYER_REDIS_URL')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -90,6 +91,20 @@ DATABASES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [
+                {
+                    "host": channel_layer_redis["HOST"],
+                    "port": channel_layer_redis.get("PORT") or 6379,
+                    "password": channel_layer_redis["PASSWORD"],
+                }
+            ]
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
